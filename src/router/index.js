@@ -9,6 +9,8 @@ import Inicio from '@/views/Inicio.vue';
 import Permisos from '@/views/administracion/Permisos.vue';
 import Roles from '@/views/administracion/Roles.vue';
 import Usuarios from '@/views/administracion/Usuarios.vue';
+// Planes
+import Planes from '@/views/planes/Planes.vue';
 // Tests
 import Test from '@/views/test/Test.vue';
 
@@ -51,6 +53,12 @@ const routes = [
         path: '/administracion/usuarios',
         name: 'admin-usuarios',
         component: Usuarios,
+      },
+      // Ruta de planes
+      {
+        path: '/planes',
+        name: 'planes-index',
+        component: Planes,
       },
       // Ruta de test
       {

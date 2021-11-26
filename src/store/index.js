@@ -19,6 +19,7 @@ export default new Vuex.Store({
     roles: [],
     permisosPadre: [],
     permisos: [],
+    planesTipos: [],
   },
   mutations: {
     CHANGE_OVERLAY(state, statusOverlay) {
@@ -53,6 +54,10 @@ export default new Vuex.Store({
 
     SET_PERMISOS(state, permisos) {
       state.permisos = permisos;
+    },
+
+    SET_PLANES_TIPO(state, planesTipo) {
+      state.planesTipos = planesTipo;
     },
   },
   actions: {
@@ -105,6 +110,15 @@ export default new Vuex.Store({
         })
         .catch(console.log);
     },
+
+    planesTipo({ commit }) {
+      axios
+        .get('/planes/planes_tipos')
+        .then(({ data }) => {
+          commit('SET_PLANES_TIPO', data.data);
+        })
+        .catch(console.log);
+    },
   },
   getters: {
     overlay(state) {
@@ -133,6 +147,10 @@ export default new Vuex.Store({
 
     obtPermisos(state) {
       return state.permisos;
+    },
+
+    obtPlanesTipo(state) {
+      return state.planesTipos;
     },
   },
   modules: {
