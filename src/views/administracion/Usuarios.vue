@@ -281,7 +281,7 @@ export default {
   computed: {
     ...mapGetters(['obtRoles']),
 
-    errorPassword() {
+    errorPassword: () => {
       if (this.form.confirmarPassword != null) {
         if (this.form.password !== this.form.confirmarPassword) {
           return 'Las contraseñas no coinciden';

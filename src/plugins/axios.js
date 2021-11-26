@@ -1,4 +1,5 @@
 import axios from 'axios';
+import router from '@/router';
 
 axios.defaults.baseURL = process.env.VUE_APP_URL_BASE;
 
@@ -13,15 +14,13 @@ axios.interceptors.request.use((configs) => {
   return config;
 }, (error) => Promise.reject(error));
 
-// axios.interceptors.response.use(function(response) {
-//   return response;
-// }, function (error) {
-//   if (error.response.status === 401 && error.response.data.message == 'Unauthenticated.') {
-//     localStorage.removeItem('user_app');
-//     router.replace({ name: 'login' });
-//   };
+axios.interceptors.response.use((response) => response, (error) => {
+  if (error.response.status === 401 && error.response.data.message === 'Unauthenticated.') {
+    localStorage.removeItem('user_app');
+    router.replace({ name: 'login' });
+  }
 
-//   return Promise.reject(error);
-// })
+  return Promise.reject(error);
+});
 
 export default axios;

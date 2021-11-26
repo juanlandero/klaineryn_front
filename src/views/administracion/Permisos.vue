@@ -239,7 +239,7 @@
               ></v-text-field>
             </v-col>
 
-            <v-col cols="12" v-if="form.acl_permiso_tipo_id === 2">
+            <v-col cols="12" v-if="form.acl_permiso_tipo_id !== 3">
               <span class="texto--text">Url</span>
               <span class="error--text"> *</span>
               <v-text-field
