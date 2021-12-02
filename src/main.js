@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import moment from 'moment';
 import Vue2Filters from 'vue2-filters';
+import VueApexCharts from 'vue-apexcharts';
 import App from './App.vue';
 import router from './router';
 import store from './store';
@@ -28,6 +29,8 @@ Vue.config.productionTip = false;
 Vue.prototype.axios = axios;
 Vue.prototype.moment = moment;
 Vue.use(Vue2Filters, vue2Config);
+Vue.use(VueApexCharts);
+Vue.component('apexchart', VueApexCharts);
 
 moment.locale('es');
 
