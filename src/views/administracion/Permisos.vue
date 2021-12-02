@@ -118,7 +118,7 @@
             {{ moment(item.created_at).format('DD/MM/YYYY') }}
           </template>
 
-          !-- Boton de acciones -->
+          <!-- Boton de acciones -->
           <template v-slot:[`item.acciones`]="{ item }">
             <v-btn @click="editar(item.id)" color="secondary" icon>
               <v-icon>mdi-square-edit-outline</v-icon>
@@ -177,15 +177,12 @@
             />
 
             <app-autocomplete
-              v-if="form.acl_permiso_tipo_id !== 1"
+              v-if="form.acl_permiso_tipo_id !== 1 && form.acl_permiso_tipo_id"
               label="Submenu de"
               placeholder="Permiso al que pertenece"
-              :items="[
-                { id: 1, texto: 'Admin'},
-                { id: 17, texto: 'Prueba'},
-              ]"
+              :items="obtPermisosPadre"
               valor="id"
-              texto="texto"
+              texto="nombre"
               :data="form.acl_permiso_padre_id"
               @value="form.acl_permiso_padre_id = $event"
               :error-messages="error.acl_permiso_padre_id"
@@ -225,7 +222,7 @@
               ></v-text-field>
             </v-col>
 
-            <v-col cols="12" v-if="form.acl_permiso_tipo_id !== 3">
+            <v-col cols="12" v-if="form.acl_permiso_tipo_id !== 3 && form.acl_permiso_tipo_id">
               <span class="texto--text">Orden</span>
               <span class="error--text"> *</span>
               <v-text-field
@@ -239,7 +236,7 @@
               ></v-text-field>
             </v-col>
 
-            <v-col cols="12" v-if="form.acl_permiso_tipo_id !== 3">
+            <v-col cols="12" v-if="form.acl_permiso_tipo_id === 2 && form.acl_permiso_tipo_id">
               <span class="texto--text">Url</span>
               <span class="error--text"> *</span>
               <v-text-field
@@ -253,7 +250,7 @@
               ></v-text-field>
             </v-col>
 
-            <v-col cols="12" v-if="form.acl_permiso_tipo_id !== 3">
+            <v-col cols="12" v-if="form.acl_permiso_tipo_id !== 3 && form.acl_permiso_tipo_id">
               <span class="texto--text">Icono</span>
               <span class="error--text"> *</span>
               <v-text-field
@@ -286,30 +283,6 @@
         </form>
       </template>
     </app-dialog>
-
-    <!-- <app-dialog
-      :abrir="dialog"
-      titulo="Cambiar icono"
-      @cerrar="dialog=false"
-    >
-      <template v-slot:contenido>
-        <form @submit.prevent="enviarDatos">
-          <v-row class="mt-2" dense>
-            <v-col cols="3" class="text-center">
-              <v-icon>{{ form.icono }}</v-icon>
-            </v-col>
-            <v-col cols="9">
-              <v-text-field
-                v-model="form.icono"
-                placeholder="Código del icono"
-                outlined
-                dense
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </form>
-      </template>
-    </app-dialog> -->
   </v-row>
 </template>
 
@@ -318,6 +291,7 @@ import { mapMutations, mapActions, mapGetters } from 'vuex';
 import AppDialog from '@/components/AppDialog.vue';
 import AppAutocomplete from '@/components/AppAutocomplete.vue';
 import funciones from '@/mixins/funciones';
+import errorResponse from '@/mixins/response';
 
 const formInit = {
   acl_permiso_padre_id: null,
@@ -335,7 +309,7 @@ export default {
 
   components: { AppDialog, AppAutocomplete },
 
-  mixins: [funciones],
+  mixins: [funciones, errorResponse],
 
   data() {
     return {
@@ -385,29 +359,8 @@ export default {
           this.permisos = response.data;
         })
         .catch((error) => {
-          switch (error.response.status) {
-            case 400:
-              this.ACTIVATE_SNACKBAR({
-                text: error.response.data.message,
-                color: 'error',
-              });
-              break;
-
-            case 422:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Datos invalidos',
-                color: 'error',
-              });
-              this.setErrors(error.response.data.errors);
-              break;
-
-            default:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Erro al iniciar sesión',
-                color: 'error',
-              });
-              break;
-          }
+          console.log(error.response);
+          this.errorsResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -426,21 +379,7 @@ export default {
           this.inicio();
         })
         .catch((error) => {
-          switch (error.response.status) {
-            case 400:
-              this.ACTIVATE_SNACKBAR({
-                text: error.response.data.message,
-                color: 'error',
-              });
-              break;
-
-            default:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Error al cambiar estatus',
-                color: 'error',
-              });
-              break;
-          }
+          this.errorsResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -451,7 +390,7 @@ export default {
 
     editar(idPermiso) {
       this.form = this.clonar(formInit);
-      this.errors = [];
+      this.error = [];
 
       this.axios
         .get(`administracion/permisos/${idPermiso}`)
@@ -466,7 +405,7 @@ export default {
 
     guardar() {
       this.cargando = true;
-      this.errors = [];
+      this.error = [];
 
       const isNew = this.form.id === undefined;
       const method = isNew ? 'post' : 'put';
@@ -488,31 +427,12 @@ export default {
           });
         })
         .catch((error) => {
-          switch (error.response.status) {
-            case 400:
-              this.ACTIVATE_SNACKBAR({
-                text: error.response.data.message,
-                color: 'error',
-              });
-              break;
-            case 422:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Favor de verificar los datos ingresados',
-                color: 'error',
-              });
-              this.error = error.response.data.errors;
-              break;
-            default:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Error al guardar',
-                color: 'error',
-              });
-              break;
-          }
+          this.errorsResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
             this.cargando = false;
+            this.permisosPadre();
           }, 500);
         });
     },
@@ -520,7 +440,7 @@ export default {
     abrirDialog() {
       this.form = this.clonar(formInit);
       this.dialog = true;
-      this.errors = [];
+      this.error = [];
     },
   },
 };

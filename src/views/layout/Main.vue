@@ -85,7 +85,7 @@ import { mapActions, mapGetters, mapMutations } from 'vuex';
 import AppMenuListItems from '@/components/AppMenuListItems.vue';
 
 export default {
-  name: 'App',
+  name: 'Main',
 
   components: { AppMenuListItems },
 

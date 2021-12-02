@@ -229,6 +229,7 @@ import { mapMutations, mapActions, mapGetters } from 'vuex';
 import AppDialog from '@/components/AppDialog.vue';
 import AppAutocomplete from '@/components/AppAutocomplete.vue';
 import funciones from '@/mixins/funciones';
+import errorResponse from '@/mixins/response';
 
 const formInit = {
   nombre: null,
@@ -244,7 +245,7 @@ export default {
 
   components: { AppDialog, AppAutocomplete },
 
-  mixins: [funciones],
+  mixins: [funciones, errorResponse],
 
   data() {
     return {
@@ -281,7 +282,7 @@ export default {
   computed: {
     ...mapGetters(['obtRoles']),
 
-    errorPassword: () => {
+    errorPassword() {
       if (this.form.confirmarPassword != null) {
         if (this.form.password !== this.form.confirmarPassword) {
           return 'Las contraseñas no coinciden';
@@ -305,29 +306,7 @@ export default {
           this.usuarios = response.data;
         })
         .catch((error) => {
-          switch (error.response.status) {
-            case 400:
-              this.ACTIVATE_SNACKBAR({
-                text: error.response.data.message,
-                color: 'error',
-              });
-              break;
-
-            case 422:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Datos invalidos',
-                color: 'error',
-              });
-              this.setErrors(error.response.data.errors);
-              break;
-
-            default:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Erro al iniciar sesión',
-                color: 'error',
-              });
-              break;
-          }
+          this.errorResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -346,21 +325,7 @@ export default {
           this.inicio();
         })
         .catch((error) => {
-          switch (error.response.status) {
-            case 400:
-              this.ACTIVATE_SNACKBAR({
-                text: error.response.data.message,
-                color: 'error',
-              });
-              break;
-
-            default:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Error al cambiar estatus',
-                color: 'error',
-              });
-              break;
-          }
+          this.errorResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -371,7 +336,7 @@ export default {
 
     editar(idUsuario) {
       this.form = this.clonar(formInit);
-      this.errors = [];
+      this.error = [];
 
       this.axios
         .get(`administracion/usuarios/${idUsuario}`)
@@ -386,7 +351,7 @@ export default {
 
     guardar() {
       this.cargando = true;
-      this.errors = [];
+      this.error = [];
 
       const isNew = this.form.id === undefined;
       const method = isNew ? 'post' : 'put';
@@ -408,27 +373,7 @@ export default {
           });
         })
         .catch((error) => {
-          switch (error.response.status) {
-            case 400:
-              this.ACTIVATE_SNACKBAR({
-                text: error.response.data.message,
-                color: 'error',
-              });
-              break;
-            case 422:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Favor de verificar los datos ingresados',
-                color: 'error',
-              });
-              this.error = error.response.data.errors;
-              break;
-            default:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Error al guardar',
-                color: 'error',
-              });
-              break;
-          }
+          this.errorResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -440,7 +385,7 @@ export default {
     abrirDialog() {
       this.form = this.clonar(formInit);
       this.dialog = true;
-      this.errors = [];
+      this.error = [];
     },
   },
 };

@@ -140,6 +140,7 @@
 import { mapMutations, mapActions, mapGetters } from 'vuex';
 import AppDialog from '@/components/AppDialog.vue';
 import funciones from '@/mixins/funciones';
+import errorResponse from '@/mixins/response';
 
 const formInit = {
   nombre: null,
@@ -151,7 +152,7 @@ export default {
 
   components: { AppDialog },
 
-  mixins: [funciones],
+  mixins: [funciones, errorResponse],
 
   data() {
     return {
@@ -204,29 +205,7 @@ export default {
           this.roles = response.data;
         })
         .catch((error) => {
-          switch (error.response.status) {
-            case 400:
-              this.ACTIVATE_SNACKBAR({
-                text: error.response.data.message,
-                color: 'error',
-              });
-              break;
-
-            case 422:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Datos invalidos',
-                color: 'error',
-              });
-              this.setErrors(error.response.data.errors);
-              break;
-
-            default:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Erro al iniciar sesión',
-                color: 'error',
-              });
-              break;
-          }
+          this.errorsResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -238,7 +217,7 @@ export default {
 
     editar(idRol) {
       this.form = this.clonar(formInit);
-      this.errors = [];
+      this.error = [];
 
       this.axios
         .get(`administracion/roles/${idRol}`)
@@ -254,7 +233,7 @@ export default {
 
     guardar() {
       this.cargando = true;
-      this.errors = [];
+      this.error = [];
 
       const isNew = this.form.id === undefined;
       const method = isNew ? 'post' : 'put';
@@ -278,27 +257,7 @@ export default {
           });
         })
         .catch((error) => {
-          switch (error.response.status) {
-            case 400:
-              this.ACTIVATE_SNACKBAR({
-                text: error.response.data.message,
-                color: 'error',
-              });
-              break;
-            case 422:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Favor de verificar los datos ingresados',
-                color: 'error',
-              });
-              this.error = error.response.data.errors;
-              break;
-            default:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Error al guardar',
-                color: 'error',
-              });
-              break;
-          }
+          this.errorsResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -311,7 +270,7 @@ export default {
       this.form = this.clonar(formInit);
       this.seleccionadoTabla = [];
       this.dialog = true;
-      this.errors = [];
+      this.error = [];
     },
   },
 };
