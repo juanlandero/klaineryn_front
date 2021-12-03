@@ -74,26 +74,28 @@
 <script>
 import { mapMutations, mapGetters } from 'vuex';
 import boton from '@/mixins/funciones';
+import errorResponse from '@/mixins/response';
 
 export default {
   name: 'Login',
-  mixins: [boton],
-  data: () => ({
-    user: {
-      email: null,
-      password: null,
-    },
-    errors: {
-      email: null,
-      password: null,
-    },
-    boton: {
+
+  mixins: [boton, errorResponse],
+
+  data() {
+    return {
+      user: {
+        email: null,
+        password: null,
+      },
+      errors: [],
+      boton: {
+        cargando: false,
+        bloqueado: false,
+      },
+      show: false,
       cargando: false,
-      bloqueado: false,
-    },
-    show: false,
-    cargando: false,
-  }),
+    };
+  },
 
   computed: {
     ...mapGetters(['snackbar']),
@@ -101,13 +103,11 @@ export default {
 
   methods: {
     ...mapMutations(['ACTIVATE_SNACKBAR']),
-    // ...mapActions(['userLogin', 'status', 'services', 'colors', 'platforms']),
 
     login() {
       this.botones(true);
       this.cargando = true;
-      this.errors.email = null;
-      this.errors.password = null;
+      this.errors = [];
 
       this.axios
         .post('/auth/login', this.user)
@@ -116,39 +116,12 @@ export default {
           this.$router.replace({ name: 'inicio' });
         })
         .catch((error) => {
-          switch (error.response.status) {
-            case 400:
-              this.ACTIVATE_SNACKBAR({
-                text: error.response.data.message,
-                color: 'error',
-              });
-              break;
-
-            case 422:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Datos invalidos',
-                color: 'error',
-              });
-              this.setErrors(error.response.data.errors);
-              break;
-
-            default:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Erro al iniciar sesión',
-                color: 'error',
-              });
-              break;
-          }
+          this.errorResponse(error.response);
         })
         .finally(() => {
           this.botones(false);
           this.cargando = false;
         });
-    },
-
-    setErrors(response) {
-      this.errors.email = response.email;
-      this.errors.password = response.password;
     },
   },
 };

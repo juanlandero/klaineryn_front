@@ -304,29 +304,7 @@ export default {
           this.planes = data.data;
         })
         .catch((error) => {
-          switch (error.response.status) {
-            case 400:
-              this.ACTIVATE_SNACKBAR({
-                text: error.response.data.message,
-                color: 'error',
-              });
-              break;
-
-            case 422:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Datos invalidos',
-                color: 'error',
-              });
-              this.setErrors(error.response.data.errors);
-              break;
-
-            default:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Erro al cargar los datos',
-                color: 'error',
-              });
-              break;
-          }
+          this.errorResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -375,27 +353,7 @@ export default {
           });
         })
         .catch((error) => {
-          switch (error.response.status) {
-            case 400:
-              this.ACTIVATE_SNACKBAR({
-                text: error.response.data.message,
-                color: 'error',
-              });
-              break;
-            case 422:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Favor de verificar los datos ingresados',
-                color: 'error',
-              });
-              this.error = error.response.data.errors;
-              break;
-            default:
-              this.ACTIVATE_SNACKBAR({
-                text: 'Error al guardar',
-                color: 'error',
-              });
-              break;
-          }
+          this.errorResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {

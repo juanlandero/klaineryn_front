@@ -11,6 +11,9 @@ import Roles from '@/views/administracion/Roles.vue';
 import Usuarios from '@/views/administracion/Usuarios.vue';
 // Planes
 import Planes from '@/views/planes/Planes.vue';
+import PreciosPlanes from '@/views/precios/PreciosPlanes.vue';
+// Tests
+import Validaciones from '@/views/validaciones/Validaciones.vue';
 // Tests
 import Test from '@/views/test/Test.vue';
 
@@ -59,6 +62,17 @@ const routes = [
         path: '/planes',
         name: 'planes-index',
         component: Planes,
+      },
+      {
+        path: '/precios-planes',
+        name: 'precios-planes-index',
+        component: PreciosPlanes,
+      },
+      // Ruta de validaciones
+      {
+        path: '/validaciones',
+        name: 'validaciones-index',
+        component: Validaciones,
       },
       // Ruta de test
       {
