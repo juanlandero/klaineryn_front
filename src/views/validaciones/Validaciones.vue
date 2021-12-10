@@ -8,7 +8,13 @@
     <!-- Gráfico -->
     <v-col cols="12" class="mb-5" style="z-index: 1">
       <v-card class="py-6 px-16 rounded-lg">
-        <apexchart height="400px" type="line" :options="options" :series="series"></apexchart>
+        <apexchart
+          v-if="mostrarChart"
+          height="400px"
+          type="line"
+          :options="options"
+          :series="series"
+        ></apexchart>
       </v-card>
     </v-col>
 
@@ -29,7 +35,7 @@
                 :lg="4"
                 :sm="4"
                 :data="filtros.fecha_desde"
-                @value="filtros.fecha_desde = $event"
+                @value="cambiarFecha(true, $event)"
               />
 
               <app-date-picker
@@ -41,7 +47,7 @@
                 :lg="4"
                 :sm="4"
                 :data="filtros.fecha_hasta"
-                @value="filtros.fecha_hasta = $event"
+                @value="cambiarFecha(false, $event)"
               />
 
               <v-col align="right" align-self="center">
@@ -54,7 +60,6 @@
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn
                       color="secondary"
-                      type="submit"
                       v-bind="attrs"
                       v-on="on"
                       rounded
@@ -105,8 +110,9 @@
                     <v-card-actions>
                       <v-spacer></v-spacer>
                       <v-btn
+                        type="submit"
                         color="primary"
-                        @click="menu = false"
+                        @click="filtrar"
                         rounded
                       >
                         Aplicar
@@ -154,11 +160,14 @@
 <script>
 import { mapMutations } from 'vuex';
 import AppDatePicker from '@/components/AppDatePicker.vue';
+import errorResponse from '@/mixins/response';
 
 export default {
   name: 'Validaciones',
 
   components: { AppDatePicker },
+
+  mixins: { errorResponse },
 
   data() {
     return {
@@ -187,9 +196,9 @@ export default {
           align: 'left',
         },
         dataLabels: {
-          enabled: true,
+          enabled: false,
         },
-        colors: ['#77B6EA', '#545454'],
+        colors: ['#FF5252', '#00C853'],
         grid: {
           row: {
             colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
@@ -197,23 +206,46 @@ export default {
           },
         },
         xaxis: {
-          categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998],
+          categories: [],
+        },
+        noData: {
+          text: 'Cargando datos...',
+        },
+        stroke: {
+          curve: 'smooth',
+        },
+        markers: {
+          size: 5,
+        },
+        tooltip: {
+          x: {
+            show: false,
+          },
+          theme: 'dark',
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'dark',
+            type: 'horizontal',
+            shadeIntensity: 0.5,
+            gradientToColors: undefined, // optiona
+            inverseColors: true,
+            opacityFrom: 1,
+            opacityTo: 1,
+            stops: [0, 50, 100],
+            colorStops: [],
+          },
         },
       },
-      series: [{
-        name: 'Success',
-        data: [30, 40, 45, 50, 49, 60, 70, 91],
-      },
-      {
-        name: 'Errors',
-        data: [3, 33, 53, 12, 34, 56, 33, 66],
-      }],
-
+      series: [],
+      mostrarChart: true,
     };
   },
 
   created() {
     this.inicio();
+    this.dataChart();
   },
 
   methods: {
@@ -224,7 +256,7 @@ export default {
       this.CHANGE_OVERLAY(true);
 
       this.axios
-        .get('/cfdi/validaciones')
+        .get('/cfdi/validaciones', { params: this.filtros })
         .then((response) => {
           this.validaciones = response.data.data;
         })
@@ -237,6 +269,45 @@ export default {
             this.desactivado = false;
           }, 300);
         });
+    },
+
+    dataChart() {
+      this.axios
+        .get('/cfdi/validaciones/grafica')
+        .then((response) => {
+          this.mostrarChart = false;
+
+          this.options.xaxis.categories = response.data.categories;
+          this.series = response.data.series.reverse();
+          // console.log(response.data.categories);
+
+          setTimeout(() => {
+            this.mostrarChart = true;
+          }, 300);
+        })
+        .catch((error) => {
+          this.errorResponse(error.response);
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.CHANGE_OVERLAY(false);
+            this.desactivado = false;
+          }, 300);
+        });
+    },
+
+    cambiarFecha(tipo, fecha) {
+      if (tipo) {
+        this.filtros.fecha_desde = fecha;
+      } else {
+        this.filtros.fecha_hasta = fecha;
+      }
+      this.inicio();
+    },
+
+    filtrar() {
+      this.menu = false;
+      this.inicio();
     },
   },
 };
