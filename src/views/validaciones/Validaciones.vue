@@ -6,8 +6,8 @@
     </v-col>
 
     <!-- Gráfico -->
-    <v-col cols="12" class="mb-5" style="z-index: 1">
-      <v-card class="py-6 px-16 rounded-lg">
+    <v-col cols="12" class="mb-4" style="z-index: 1">
+      <v-card class="py-6 px-lg-16 rounded-lg">
         <apexchart
           v-if="mostrarChart"
           height="400px"
@@ -31,7 +31,7 @@
                 label="Desde"
                 clearable
                 rounded
-                :cols="3"
+                :cols="12"
                 :lg="4"
                 :sm="4"
                 :data="filtros.fecha_desde"
@@ -43,7 +43,7 @@
                 label="Hasta"
                 clearable
                 rounded
-                :cols="3"
+                :cols="12"
                 :lg="4"
                 :sm="4"
                 :data="filtros.fecha_hasta"
@@ -175,7 +175,7 @@ export default {
 
   components: { AppDatePicker },
 
-  mixins: [ errorResponse ],
+  mixins: [errorResponse],
 
   data() {
     return {

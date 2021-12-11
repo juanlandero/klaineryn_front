@@ -12,6 +12,7 @@
       :item-value="valor"
       :item-text="texto"
       :error-messages="errorMessages"
+      :hide-details="hideDetails"
       :no-data-text="nodata"
       :clearable="clearable"
       :multiple="multiple"
@@ -90,6 +91,10 @@ export default {
       default: 'Sin datos',
     },
 
+    hideDetails: {
+      type: Boolean,
+      default: false,
+    },
     errorMessages: {
       type: [String, Array],
       default: '',

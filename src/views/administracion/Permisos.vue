@@ -13,7 +13,6 @@
             <v-text-field
               label="Nombre del permiso"
               v-model="filtros.nombre"
-              hide-details
               clearable
               outlined
               rounded
@@ -54,22 +53,22 @@
           />
 
           <app-autocomplete
-              label-in="Estatus"
-              :items="[
-                {id: null, texto: 'Todos'},
-                {id: '1', texto: 'Activo'},
-                {id: '0', texto: 'Inactivo'},
-              ]"
-              valor="id"
-              texto="texto"
-              :data="filtros.activo"
-              @value="filtros.activo = $event"
-              :rounded="true"
-              clearable
-              cols="12"
-              lg="2"
-              sm="3"
-            />
+            label-in="Estatus"
+            :items="[
+              {id: null, texto: 'Todos'},
+              {id: '1', texto: 'Activo'},
+              {id: '0', texto: 'Inactivo'},
+            ]"
+            valor="id"
+            texto="texto"
+            :data="filtros.activo"
+            @value="filtros.activo = $event"
+            :rounded="true"
+            clearable
+            cols="12"
+            lg="2"
+            sm="3"
+          />
 
           <v-col align="right">
             <v-btn type="submit" color="primary" :disabled="desactivado" rounded>

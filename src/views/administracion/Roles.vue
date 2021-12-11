@@ -13,7 +13,6 @@
             <v-text-field
               label="Nombre del rol"
               v-model="filtros.nombre"
-              hide-details
               clearable
               outlined
               rounded

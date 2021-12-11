@@ -13,7 +13,6 @@
             <v-text-field
               label="Nombre"
               v-model="filtros.alias"
-              hide-details
               clearable
               outlined
               rounded
@@ -137,7 +136,7 @@ export default {
 
   components: { AppDialog },
 
-  mixins: [ funciones, errorResponse ],
+  mixins: [funciones, errorResponse],
 
   data() {
     return {

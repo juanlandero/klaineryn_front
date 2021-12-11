@@ -13,7 +13,6 @@
             <v-text-field
               label="Nombre"
               v-model="filtros.nombre"
-              hide-details
               clearable
               outlined
               rounded
@@ -24,7 +23,6 @@
             <v-text-field
               label="Email"
               v-model="filtros.email"
-              hide-details
               clearable
               outlined
               rounded
