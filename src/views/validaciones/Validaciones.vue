@@ -137,6 +137,24 @@
             pageText: '{0}-{1} de {2}',
           }"
         >
+          <template
+            v-slot:body="{ items }"
+          >
+            <tbody>
+              <tr
+                v-for="item in items"
+                :key="item.name"
+                :class="item.success ? '' : 'red lighten-5'"
+              >
+                <td>{{ item.rfc_emisor }}</td>
+                <td>{{ item.rfc_receptor }}</td>
+                <td>{{ item.uuid }}</td>
+                <td>{{ item.total }}</td>
+                <td>{{ item.created_at }}</td>
+              </tr>
+            </tbody>
+          </template>
+
           <!-- Fecha de creación -->
           <template v-slot:[`item.success`]="{ item }">
             {{ moment(item.success).format('DD/MM/YYYY') }}
