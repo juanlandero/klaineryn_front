@@ -12,8 +12,10 @@ import Usuarios from '@/views/administracion/Usuarios.vue';
 // Planes
 import Planes from '@/views/planes/Planes.vue';
 import PreciosPlanes from '@/views/precios/PreciosPlanes.vue';
-// Tests
+// Validaciones
 import Validaciones from '@/views/validaciones/Validaciones.vue';
+// Desarrollador
+import Llaves from '@/views/desarrollador/Llaves.vue';
 // Tests
 import Test from '@/views/test/Test.vue';
 
@@ -69,6 +71,12 @@ const routes = [
         component: PreciosPlanes,
       },
       // Ruta de validaciones
+      {
+        path: '/desarrollador/llaves',
+        name: 'llaves-index',
+        component: Llaves,
+      },
+      // Ruta de llaves
       {
         path: '/validaciones',
         name: 'validaciones-index',

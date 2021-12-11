@@ -233,6 +233,7 @@ import { mapMutations, mapActions, mapGetters } from 'vuex';
 import AppDialog from '@/components/AppDialog.vue';
 import AppAutocomplete from '@/components/AppAutocomplete.vue';
 import funciones from '@/mixins/funciones';
+import errorResponse from '@/mixins/response';
 
 const formInit = {
   nombre: null,
@@ -248,7 +249,7 @@ export default {
 
   components: { AppDialog, AppAutocomplete },
 
-  mixins: [funciones],
+  mixins: [ funciones, errorResponse ],
 
   data() {
     return {

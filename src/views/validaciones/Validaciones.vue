@@ -150,19 +150,9 @@
                 <td>{{ item.rfc_receptor }}</td>
                 <td>{{ item.uuid }}</td>
                 <td>{{ item.total }}</td>
-                <td>{{ item.created_at }}</td>
+                <td>{{ moment(item.created_at).format('DD/MM/YYYY') }}</td>
               </tr>
             </tbody>
-          </template>
-
-          <!-- Fecha de creación -->
-          <template v-slot:[`item.success`]="{ item }">
-            {{ moment(item.success).format('DD/MM/YYYY') }}
-          </template>
-
-          <!-- Fecha de creación -->
-          <template v-slot:[`item.created_at`]="{ item }">
-            {{ moment(item.created_at).format('DD/MM/YYYY') }}
           </template>
 
           <!-- Sin datos en la tabla -->
@@ -185,7 +175,7 @@ export default {
 
   components: { AppDatePicker },
 
-  mixins: { errorResponse },
+  mixins: [ errorResponse ],
 
   data() {
     return {
