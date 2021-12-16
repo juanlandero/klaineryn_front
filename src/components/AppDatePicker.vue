@@ -17,6 +17,7 @@
           v-model="fecha"
           v-bind="attrs"
           v-on="on"
+          :label="labelIn"
           :placeholder="placeholder"
           :clearable="clearable"
           :rounded="rounded"
@@ -58,6 +59,10 @@ export default {
     },
 
     label: {
+      type: String,
+      default: '',
+    },
+    labelIn: {
       type: String,
       default: '',
     },
