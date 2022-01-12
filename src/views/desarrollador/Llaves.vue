@@ -48,20 +48,23 @@
             {{ moment(item.created_at).format('DD/MM/YYYY') }}
           </template>
 
+          <!-- Boton de estatus -->
+          <template v-slot:[`item.habilitado`]="{ item }">
+            <v-layout justify-center>
+              <v-switch
+                v-model="item.habilitado"
+                color="success"
+                @change="habilitar(item.id, item.habilitado)"
+                inset
+              ></v-switch>
+            </v-layout>
+          </template>
+
           <!-- Boton de acciones -->
-          <template v-slot:[`item.acciones`]="{ item }">
-            <v-row>
-              <v-col>
-                <v-btn @click="editar(item.id)" color="secondary" icon>
-                  <v-icon>mdi-square-edit-outline</v-icon>
-                </v-btn>
-              </v-col>
-              <v-col>
-                <v-btn @click="editar(item.id)" color="secondary" icon>
-                  <v-icon>mdi-delete-outline</v-icon>
-                </v-btn>
-              </v-col>
-            </v-row>
+          <template v-slot:[`item.eliminar`]="{ item }">
+            <v-btn @click="confirmarEliminar(item.id)" color="secondary" icon>
+              <v-icon>mdi-delete-outline</v-icon>
+            </v-btn>
           </template>
 
           <!-- Sin datos en la tabla -->
@@ -109,8 +112,43 @@
             </v-col>
 
             <v-col cols="12" class="text-center mt-5">
-              <v-btn color="primary" type="submit" :loading="cargando">
+              <v-btn color="primary" type="submit" :loading="cargando" rounded>
                 Guardar
+              </v-btn>
+            </v-col>
+
+          </v-row>
+        </form>
+      </template>
+    </app-dialog>
+
+    <!-- Eliminar llave -->
+    <app-dialog
+      titulo="Eliminar llave"
+      :abrir="dialogDelete"
+      @cerrar="dialogDelete = false"
+    >
+      <template v-slot:contenido>
+        <form @submit.prevent="eliminar()">
+          <v-row class="mt-2" dense>
+            <v-col cols="12">
+              <span class="texto--text">
+                Confirma el eliminado ingresando el alias de la llave.
+              </span>
+              <v-text-field
+                v-model="alias"
+                placeholder="Alias de la llave"
+                autocomplete="off"
+                :error-messages="errorAlias"
+                outlined
+                rounded
+                dense
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="12" class="text-center mt-5">
+              <v-btn color="error" type="submit" :loading="cargando" rounded>
+                Confirmar eliminado
               </v-btn>
             </v-col>
 
@@ -145,15 +183,20 @@ export default {
         { text: 'Alias', value: 'alias' },
         { text: 'Key', align: 'center', value: 'key' },
         { text: 'Creado', align: 'center', value: 'created_at' },
-        { text: 'Acciones', align: 'center', value: 'acciones' },
+        { text: 'Habilitado', align: 'center', value: 'habilitado' },
+        { text: 'Eliminar', align: 'center', value: 'eliminar' },
       ],
       filtros: {
         alias: null,
       },
       llaves: [],
+      alias: null,
+      idKey: null,
       dialog: false,
+      dialogDelete: false,
       form: this.clonar(formInit),
       error: [],
+      errorAlias: null,
       cargando: false,
       desactivado: false,
     };
@@ -231,6 +274,59 @@ export default {
           setTimeout(() => {
             this.cargando = false;
           }, 500);
+        });
+    },
+
+    habilitar(id, value) {
+      this.CHANGE_OVERLAY(true);
+
+      this.axios
+        .put(`/validation_keys/${id}`, { habilitado: value })
+        .then(() => {
+          this.inicio();
+          this.ACTIVATE_SNACKBAR({
+            text: 'Cambio el estado de la llave.',
+            color: 'success',
+          });
+        })
+        .catch((error) => {
+          this.errorResponse(error.response);
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.CHANGE_OVERLAY(false);
+          }, 300);
+        });
+    },
+
+    confirmarEliminar(id) {
+      this.alias = null;
+      this.dialogDelete = true;
+      this.idKey = id;
+    },
+
+    eliminar() {
+      this.CHANGE_OVERLAY(true);
+
+      this.axios
+        .delete(`/validation_keys/${this.idKey}`, { params: { alias: this.alias } })
+        .then(() => {
+          this.dialogDelete = false;
+          this.idKey = null;
+          this.inicio();
+          this.ACTIVATE_SNACKBAR({
+            text: 'Se ha eliminado la llave',
+            color: 'success',
+          });
+        })
+        .catch((error) => {
+          this.errorResponse(error.response);
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.CHANGE_OVERLAY(false);
+            this.idKey = null;
+          }, 300);
         });
     },
 

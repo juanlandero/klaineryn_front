@@ -15,6 +15,15 @@
         :datos="obtMenu"
         color="secondary"
       ></app-menu-list-items>
+
+      <template v-slot:append>
+        <div class="pa-2">
+          <v-btn color="primary" @click="nuevaVentana" text block rounded>
+            <v-icon left>mdi-file-code-outline</v-icon>
+            Documentación
+          </v-btn>
+        </div>
+      </template>
     </v-navigation-drawer>
 
     <!-- App bar -->
@@ -124,6 +133,10 @@ export default {
         .catch((error) => {
           console.log(error);
         });
+    },
+
+    nuevaVentana() {
+      window.open('//localhost:8000/docs/', 'Documentación');
     },
   },
 };
