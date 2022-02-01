@@ -1,85 +1,104 @@
 <template>
-  <v-row
-    class="justify-center d-flex align-center bgcolor"
-    style="height: 100vh; margin: 0"
+  <v-card
+    class="rounded-lg animate__animated animate__fadeIn"
+    :class="animacion"
+    elevation="24"
   >
-    <v-col cols="12" md="6" lg="4" sm="8">
-      <v-row class="justify-center mb-16">
-        <v-col cols="9">
-          <!-- <v-img src="@/assets/place_logo.png" alt="Place"></v-img> -->
-        </v-col>
-      </v-row>
-      <v-card>
-        <v-progress-linear
-          :active="cargando"
-          indeterminate
-          color="accent"
-        ></v-progress-linear>
+    <v-card-title class="justify-center d-flex flex-column">
+      <span class="text-h4 primary--text font-weight-regular">Iniciar Sesión</span>
+      <p class="text-caption texto--text">Inicia sesión para administrar tu cuenta</p>
+    </v-card-title>
 
-        <v-card-title class="justify-center d-flex flex-column">
-          <span class="text-h4 secondary--text font-weight-regular"
-            >Bienvenido</span
-          >
-          <p class="text-caption stcolor--text">Inicia sesión en tu cuenta</p>
-        </v-card-title>
+    <v-card-text class="pt-1 pb-3 px-6">
+      <form @submit.prevent="login">
+        <v-text-field
+          placeholder="Correo electrónico"
+          prepend-inner-icon="mdi-email-outline"
+          autocomplete="off"
+          v-model="user.email"
+          :error-messages="errors.email"
+          :disabled="boton.bloqueado"
+          outlined
+        ></v-text-field>
 
-        <v-card-text class="pt-1 pb-3">
-          <form @submit.prevent="login">
-            <v-text-field
-              color="white"
-              label="email"
-              prepend-inner-icon="mdi-account"
-              autocomplete="off"
-              v-model="user.email"
-              :error-messages="errors.email"
-              solo-inverted
-              autofocus
-            ></v-text-field>
+        <v-text-field
+          placeholder="Contraseña"
+          prepend-inner-icon="mdi-key-outline"
+          :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="show ? 'text' : 'password'"
+          autocomplete="off"
+          v-model="user.password"
+          :error-messages="errors.password"
+          @click:append="show = !show"
+          :disabled="boton.bloqueado"
+          outlined
+        ></v-text-field>
 
-            <v-text-field
-              color="white"
-              label="Contraseña"
-              prepend-inner-icon="mdi-lock"
-              :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-              :type="show ? 'text' : 'password'"
-              autocomplete="off"
-              v-model="user.password"
-              :error-messages="errors.password"
-              @click:append="show = !show"
-              solo-inverted
-            ></v-text-field>
+        <v-btn
+          color="primary"
+          type="submit"
+          :bloqueado="boton.bloqueado"
+          class="mt-4"
+          large
+          block
+          depressed
+          :loading="cargando"
+        >Iniciar sesión</v-btn>
 
-            <v-btn
-              color="secondary"
-              elevation="2"
-              type="submit"
-              :bloqueado="boton.bloqueado"
-              depressed
-              large
-              block
-              >Iniciar sesión</v-btn
-            >
-          </form>
-        </v-card-text>
-      </v-card>
-    </v-col>
+        <p class="mt-10 text-center">
+          ¿Aun no estas registrado?
+          <a @click="mostrarAnimacion">Registrarme</a>
+        </p>
+        <p class="text-center">
+          <a @click="abrirDialog">Olvide mi contraseña</a>
+        </p>
+      </form>
+    </v-card-text>
 
-    <!-- Snackbar -->
-    <v-snackbar v-model="snackbar.open" :color="snackbar.color">
-      {{ snackbar.text }}
-    </v-snackbar>
-  </v-row>
+    <app-dialog
+      titulo="Recuperar contraseña"
+      :abrir="dialog"
+      @cerrar="dialog=false"
+    >
+      <template v-slot:contenido>
+        <form @submit.prevent="guardar()">
+          <v-row class="mt-2" dense>
+            <v-col cols="12">
+              <v-text-field
+                v-model="email"
+                placeholder="Escribe el correo de tu cuenta"
+                autocomplete="off"
+                :error-messages="errors.email"
+                outlined
+                rounded
+                dense
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="12" class="text-center mt-5">
+              <v-btn color="primary" type="submit" :loading="cargando">
+                Guardar
+              </v-btn>
+            </v-col>
+          </v-row>
+        </form>
+      </template>
+    </app-dialog>
+  </v-card>
 </template>
 
 <script>
-import { mapMutations, mapGetters } from 'vuex';
-import boton from '@/mixins/funciones';
-import errorResponse from '@/mixins/response';
+import { mapMutations } from 'vuex';
+import botones from '@/mixins/funciones';
+import errorsResponse from '@/mixins/response';
+import AppDialog from '@/components/AppDialog.vue';
 
 export default {
   name: 'Login',
 
-  mixins: [boton, errorResponse],
+  components: { AppDialog },
+
+  mixins: [botones, errorsResponse],
 
   data() {
     return {
@@ -94,11 +113,10 @@ export default {
       },
       show: false,
       cargando: false,
+      animacion: null,
+      dialog: false,
+      email: null,
     };
-  },
-
-  computed: {
-    ...mapGetters(['snackbar']),
   },
 
   methods: {
@@ -116,12 +134,25 @@ export default {
           this.$router.replace({ name: 'inicio' });
         })
         .catch((error) => {
-          this.errorResponse(error.response);
+          this.errorsResponse(error.response);
         })
         .finally(() => {
-          this.botones(false);
-          this.cargando = false;
+          setTimeout(() => {
+            this.botones(false);
+            this.cargando = false;
+          }, 350);
         });
+    },
+    mostrarAnimacion() {
+      this.animacion = 'animate__fadeOut';
+      setTimeout(() => {
+        this.$router.push({ name: 'registro' });
+      }, 500);
+    },
+    abrirDialog() {
+      this.email = null;
+      this.dialog = true;
+      this.error = [];
     },
   },
 };

@@ -2,6 +2,7 @@ import Vue from 'vue';
 import moment from 'moment';
 import Vue2Filters from 'vue2-filters';
 import VueApexCharts from 'vue-apexcharts';
+import animate from 'animate.css';
 import App from './App.vue';
 import router from './router';
 import store from './store';
@@ -30,6 +31,7 @@ Vue.prototype.axios = axios;
 Vue.prototype.moment = moment;
 Vue.use(Vue2Filters, vue2Config);
 Vue.use(VueApexCharts);
+Vue.use(animate);
 Vue.component('apexchart', VueApexCharts);
 
 moment.locale('es');

@@ -19,11 +19,18 @@ export default {
           break;
 
         case 422:
+          if (data.error) {
+            this.ACTIVATE_SNACKBAR({
+              text: data.message,
+              color: 'error',
+            });
+            break;
+          }
           this.ACTIVATE_SNACKBAR({
             text: 'Favor de verificar los datos ingresados',
             color: 'error',
           });
-          this.error = data.errors;
+          this.errors = data.errors;
           break;
 
         default:

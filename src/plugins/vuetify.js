@@ -20,6 +20,7 @@ export default new Vuetify({
         texto: '#5E5873',
         bgcolor: '#ECEFF1',
         bgcard: '#fff',
+        bglogin: '#f8fafb',
       },
       dark: {
         primary: colors.red,

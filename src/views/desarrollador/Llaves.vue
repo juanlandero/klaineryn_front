@@ -139,7 +139,7 @@
                 v-model="alias"
                 placeholder="Alias de la llave"
                 autocomplete="off"
-                :error-messages="errorAlias"
+                :error-messages="error.alias"
                 outlined
                 rounded
                 dense
@@ -163,7 +163,7 @@
 import { mapMutations } from 'vuex';
 import AppDialog from '@/components/AppDialog.vue';
 import funciones from '@/mixins/funciones';
-import errorResponse from '@/mixins/response';
+import errorsResponse from '@/mixins/response';
 
 const formInit = {
   alias: null,
@@ -174,7 +174,7 @@ export default {
 
   components: { AppDialog },
 
-  mixins: [funciones, errorResponse],
+  mixins: [funciones, errorsResponse],
 
   data() {
     return {
@@ -196,7 +196,6 @@ export default {
       dialogDelete: false,
       form: this.clonar(formInit),
       error: [],
-      errorAlias: null,
       cargando: false,
       desactivado: false,
     };
@@ -219,7 +218,7 @@ export default {
           this.llaves = data;
         })
         .catch((error) => {
-          this.errorResponse(error.response);
+          this.errorsResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -231,7 +230,7 @@ export default {
 
     editar(idLlave) {
       this.form = this.clonar(formInit);
-      this.errors = [];
+      this.error = [];
 
       this.axios
         .get(`validation_keys/${idLlave}`)
@@ -246,7 +245,7 @@ export default {
 
     guardar() {
       this.cargando = true;
-      this.errors = [];
+      this.error = [];
 
       const isNew = this.form.id === undefined;
       const method = isNew ? 'post' : 'put';
@@ -268,7 +267,7 @@ export default {
           });
         })
         .catch((error) => {
-          this.errorResponse(error.response);
+          this.errorsResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -290,7 +289,7 @@ export default {
           });
         })
         .catch((error) => {
-          this.errorResponse(error.response);
+          this.errorsResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -300,6 +299,7 @@ export default {
     },
 
     confirmarEliminar(id) {
+      this.error = [];
       this.alias = null;
       this.dialogDelete = true;
       this.idKey = id;
@@ -320,12 +320,11 @@ export default {
           });
         })
         .catch((error) => {
-          this.errorResponse(error.response);
+          this.errorsResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
             this.CHANGE_OVERLAY(false);
-            this.idKey = null;
           }, 300);
         });
     },
@@ -333,7 +332,7 @@ export default {
     abrirDialog() {
       this.form = this.clonar(formInit);
       this.dialog = true;
-      this.errors = [];
+      this.error = [];
     },
 
   },

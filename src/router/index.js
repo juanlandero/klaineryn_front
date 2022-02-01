@@ -2,7 +2,9 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 import Main from '@/views/layout/Main.vue';
+import IniciarSesion from '@/views/login/Index.vue';
 import Login from '@/views/login/Login.vue';
+import Registro from '@/views/login/Registro.vue';
 
 import Inicio from '@/views/Inicio.vue';
 // Administración
@@ -24,12 +26,16 @@ Vue.use(VueRouter);
 const routes = [
   // login
   {
-    path: '/login',
-    name: 'login',
-    component: Login,
+    path: '/iniciar-sesion',
+    component: IniciarSesion,
     meta: {
       layout: 'full',
+      requiresAuth: false,
     },
+    children: [
+      { path: '', component: Login, name: 'login' },
+      { path: 'registro', component: Registro, name: 'registro' },
+    ],
   },
 
   {
@@ -99,10 +105,18 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.name !== 'login' && !localStorage.getItem('user_app')) {
+  if (
+    to.matched.some((record) => record.meta.requiresAuth)
+    && (!localStorage.getItem('user_app') || localStorage.getItem('user_app') === 'null')
+  ) {
+    // this route requires Auth, check if logged in
+    // if not, redirect to login page.
+    window.console.log('Not authenticated');
+
     next({ name: 'login' });
+  } else {
+    next();
   }
-  next();
 });
 
 export default router;
