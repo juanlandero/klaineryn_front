@@ -5,6 +5,11 @@
 npm install
 ```
 
+## Arrancar el proyecto
+```
+npm run serve
+```
+
 ## Variables globales
 Crea dos archivos .env para guardar las variables globales necesarias en el proyecto
 
