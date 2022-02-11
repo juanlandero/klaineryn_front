@@ -2,9 +2,10 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 import Main from '@/views/layout/Main.vue';
-import IniciarSesion from '@/views/login/Index.vue';
-import Login from '@/views/login/Login.vue';
-import Registro from '@/views/login/Registro.vue';
+import IniciarSesion from '@/views/auth/Index.vue';
+import Login from '@/views/auth/Login.vue';
+import Registro from '@/views/auth/Registro.vue';
+import Activacion from '@/views/auth/Activacion.vue';
 
 import Inicio from '@/views/Inicio.vue';
 // Administración
@@ -36,6 +37,15 @@ const routes = [
       { path: '', component: Login, name: 'login' },
       { path: 'registro', component: Registro, name: 'registro' },
     ],
+  },
+
+  {
+    path: '/user/:tipo',
+    component: Activacion,
+    meta: {
+      layout: 'full',
+      requiresAuth: false,
+    },
   },
 
   {
