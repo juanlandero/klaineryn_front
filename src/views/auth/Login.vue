@@ -119,6 +119,10 @@ export default {
     };
   },
 
+  mounted() {
+    this.postEmail();
+  },
+
   methods: {
     ...mapMutations(['ACTIVATE_SNACKBAR']),
 
@@ -143,16 +147,58 @@ export default {
           }, 350);
         });
     },
+
     mostrarAnimacion() {
       this.animacion = 'animate__fadeOut';
       setTimeout(() => {
         this.$router.push({ name: 'registro' });
       }, 500);
     },
+
     abrirDialog() {
       this.email = null;
       this.dialog = true;
       this.error = [];
+    },
+
+    postEmail() {
+      const estado = JSON.parse(window.localStorage.getItem('user_status'));
+      let texto = '';
+      let color = 'info';
+
+      if (estado !== null) {
+        switch (estado) {
+          case 'invalid':
+            texto = 'El código ingresado es invalido.';
+            color = 'warning';
+            break;
+          case 'active':
+            texto = 'Su usuario ya ha sido activado previamente.';
+            color = 'info';
+            break;
+          case 'activated':
+            texto = '¡Su usuario ha sido activado! Ya puede iniciar sesión.';
+            color = 'green';
+            break;
+          case 'user_not_found':
+            texto = 'No hemos encontrado su usuario. Favor de notificar al correo de soporte.';
+            color = 'error';
+            break;
+
+          default:
+            texto = 'Ha ocurrido un error en el proceso de activación. Notifique al correo de soporte.';
+            color = 'error';
+            break;
+        }
+
+        this.ACTIVATE_SNACKBAR({
+          text: texto,
+          color,
+        });
+        localStorage.removeItem('user_status');
+      }
+
+      console.log(estado);
     },
   },
 };

@@ -40,7 +40,7 @@ const routes = [
   },
 
   {
-    path: '/user/:tipo',
+    path: '/usuario/:estatus',
     component: Activacion,
     meta: {
       layout: 'full',

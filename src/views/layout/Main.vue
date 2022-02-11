@@ -68,7 +68,7 @@
     </v-main>
 
     <!-- Overlay -->
-    <v-snackbar v-model="snackbar.open" :color="snackbar.color">
+    <v-snackbar v-model="snackbar.open" :color="snackbar.color" :timeout="snackbar.tiempo">
       {{ snackbar.text }}
       <template v-slot:action="{ attrs }">
         <v-btn @click="CLOSE_SNACKBAR" v-bind="attrs" icon>

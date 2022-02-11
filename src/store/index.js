@@ -10,7 +10,7 @@ export default new Vuex.Store({
     snackbar: {
       open: false,
       text: 'snackbar',
-      timeout: 2000,
+      timeout: 2500,
       color: 'primary',
     },
 

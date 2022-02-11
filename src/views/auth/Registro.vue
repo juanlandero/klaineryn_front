@@ -130,6 +130,10 @@ export default {
         .post('/auth/register', this.form)
         .then(() => {
           this.$router.replace({ name: 'login' });
+          this.ACTIVATE_SNACKBAR({
+            text: 'Hemos enviado un correo para la activación de su cuenta.',
+            color: 'info',
+          });
         })
         .catch((error) => {
           this.errorsResponse(error.response);
