@@ -26,9 +26,9 @@
     </v-col>
 
     <!-- Sección derecha -->
-    <v-col cols="12" md="6" lg="6" sm="8">
+    <v-col cols="12 d-flex" md="6" lg="6" sm="8">
       <v-row class="justify-center">
-        <v-col cols="9">
+        <v-col cols="9" class="align-self-center mb-7">
           <router-view></router-view>
         </v-col>
       </v-row>
