@@ -69,7 +69,7 @@
             pageText: '{0}-{1} de {2}',
           }"
         >
-          <!-- Boton de estatus -->
+          <!-- Botón de estatus -->
           <template v-slot:[`item.is_active`]="{ item }">
             <v-layout justify-center>
               <v-switch
@@ -86,11 +86,42 @@
             {{ moment(item.created_at).format('DD/MM/YYYY') }}
           </template>
 
-          <!-- Boton de acciones -->
+          <!-- Botones de acciones -->
           <template v-slot:[`item.acciones`]="{ item }">
-            <v-btn @click="editar(item.id)" color="secondary" icon>
-              <v-icon>mdi-square-edit-outline</v-icon>
-            </v-btn>
+            <v-row>
+              <v-col>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      @click="abrirModalSaldo(item.id)"
+                      color="secondary"
+                      v-bind="attrs"
+                      v-on="on"
+                      icon
+                    >
+                      <v-icon>mdi-currency-usd</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Agregar saldo</span>
+                </v-tooltip>
+              </v-col>
+              <v-col>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      @click="editar(item.id)"
+                      color="secondary"
+                      v-bind="attrs"
+                      v-on="on"
+                      icon
+                    >
+                      <v-icon>mdi-square-edit-outline</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Editar</span>
+                </v-tooltip>
+              </v-col>
+            </v-row>
           </template>
 
           <!-- Sin datos en la tabla -->
@@ -114,7 +145,7 @@
       <v-icon>mdi-plus</v-icon>
     </v-btn>
 
-    <!-- Agregar/Editar -->
+    <!-- Modal Agregar/Editar -->
     <app-dialog
       :titulo="form.id ? 'Modificar Usuarios' : 'Nuevo Usuario'"
       :abrir="dialog"
@@ -130,7 +161,7 @@
                 v-model="form.nombre"
                 placeholder="Nombre"
                 autocomplete="off"
-                :error-messages="error.nombre"
+                :error-messages="errors.nombre"
                 outlined
                 rounded
                 dense
@@ -145,7 +176,7 @@
               texto="nombre"
               :data="form.rol_id"
               @value="form.rol_id = $event"
-              :error-messages="error.rol_id"
+              :error-messages="errors.rol_id"
               nodata="Sin roles"
               requerido
               :rounded="true"
@@ -161,7 +192,7 @@
                 v-model="form.email"
                 placeholder="e-mail"
                 autocomplete="off"
-                :error-messages="error.email"
+                :error-messages="errors.email"
                 outlined
                 rounded
                 dense
@@ -178,7 +209,7 @@
                 :type="show ? 'text':'password'"
                 @click:append="show = !show"
                 autocomplete="off"
-                :error-messages="error.password"
+                :error-messages="errors.password"
                 outlined
                 rounded
                 dense
@@ -215,6 +246,52 @@
               </v-btn>
             </v-col>
 
+          </v-row>
+        </form>
+      </template>
+    </app-dialog>
+    <!-- Modal Agregar Saldo -->
+    <app-dialog
+      titulo="Agregar Saldo"
+      :abrir="dialogSaldo"
+      @cerrar="dialogSaldo = false"
+    >
+      <template v-slot:contenido>
+        <form @submit.prevent="guardarSaldo">
+          <v-row class="mt-2" dense>
+            <app-autocomplete
+              label="Plan"
+              placeholder="Elige un tipo de plan"
+              :items="tipos_saldos"
+              valor="id"
+              texto="nombre"
+              :data="formSaldo.descripciones_tipo_id"
+              @value="formSaldo.descripciones_tipo_id = $event"
+              :error-messages="errors.descripciones_tipo_id"
+              nodata="Sin tipos de recarga"
+              requerido
+              :rounded="true"
+            />
+
+            <v-col cols="6">
+              <span class="texto--text">Saldo</span>
+              <span class="error--text"> *</span>
+              <v-text-field
+                v-model="formSaldo.cantidad"
+                placeholder="Cantidad"
+                autocomplete="off"
+                :error-messages="errors.cantidad"
+                outlined
+                rounded
+                dense
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="12" class="text-center mt-5">
+              <v-btn color="primary" type="submit" :loading="cargando">
+                Agregar
+              </v-btn>
+            </v-col>
           </v-row>
         </form>
       </template>
@@ -263,18 +340,26 @@ export default {
       },
       usuarios: [],
       dialog: false,
+      dialogSaldo: false,
       form: this.clonar(formInit),
-      error: [],
+      formSaldo: {
+        user_id: null,
+        descripciones_tipo_id: null,
+        cantidad: null,
+      },
+      errors: [],
       show: false,
       show2: false,
       cargando: false,
       desactivado: false,
+      tipos_saldos: null,
     };
   },
 
   created() {
     this.inicio();
     this.roles();
+    this.obtTiposSaldos();
   },
 
   computed: {
@@ -304,7 +389,7 @@ export default {
           this.usuarios = response.data;
         })
         .catch((error) => {
-          this.errorResponse(error.response);
+          this.errorsResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -323,7 +408,7 @@ export default {
           this.inicio();
         })
         .catch((error) => {
-          this.errorResponse(error.response);
+          this.errorsResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -334,7 +419,7 @@ export default {
 
     editar(idUsuario) {
       this.form = this.clonar(formInit);
-      this.error = [];
+      this.errors = [];
 
       this.axios
         .get(`administracion/usuarios/${idUsuario}`)
@@ -349,7 +434,7 @@ export default {
 
     guardar() {
       this.cargando = true;
-      this.error = [];
+      this.errors = [];
 
       const isNew = this.form.id === undefined;
       const method = isNew ? 'post' : 'put';
@@ -371,7 +456,7 @@ export default {
           });
         })
         .catch((error) => {
-          this.errorResponse(error.response);
+          this.errorsResponse(error.response);
         })
         .finally(() => {
           setTimeout(() => {
@@ -380,10 +465,48 @@ export default {
         });
     },
 
+    abrirModalSaldo(idUsuario) {
+      this.dialogSaldo = true;
+      this.formSaldo.user_id = idUsuario;
+      this.formSaldo.descripciones_tipo_id = null;
+      this.formSaldo.cantidad = null;
+      this.errors = [];
+    },
+
+    guardarSaldo() {
+      this.CHANGE_OVERLAY(true);
+
+      this.axios
+        .post('/saldos/add_saldo', this.formSaldo)
+        .then(() => {
+          this.inicio();
+          this.dialogSaldo = false;
+        })
+        .catch((error) => {
+          this.errorsResponse(error.response);
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.CHANGE_OVERLAY(false);
+          }, 300);
+        });
+    },
+
+    obtTiposSaldos() {
+      this.axios
+        .get('/planes/descripciones_tipos')
+        .then((response) => {
+          this.tipos_saldos = response.data.data;
+        })
+        .catch((error) => {
+          console.log(error.response);
+        });
+    },
+
     abrirDialog() {
       this.form = this.clonar(formInit);
       this.dialog = true;
-      this.error = [];
+      this.errors = [];
     },
   },
 };
