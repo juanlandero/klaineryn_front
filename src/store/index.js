@@ -13,6 +13,12 @@ export default new Vuex.Store({
       timeout: 2500,
       color: 'primary',
     },
+    banner: {
+      visible: false,
+      text: '',
+      color: '',
+      icon: '',
+    },
 
     user: [],
     menu: [],
@@ -34,6 +40,17 @@ export default new Vuex.Store({
 
     CLOSE_SNACKBAR(state) {
       state.snackbar.open = false;
+    },
+
+    ACTIVATE_BANNER(state, banner) {
+      state.banner.visible = banner.visible;
+      state.banner.text = banner.text;
+      state.banner.color = banner.color;
+      state.banner.icon = banner.icon;
+    },
+
+    CLOSE_BANNER(state) {
+      state.banner.visible = false;
     },
 
     SET_USER(state, user) {
@@ -127,6 +144,10 @@ export default new Vuex.Store({
 
     snackbar(state) {
       return state.snackbar;
+    },
+
+    banner(state) {
+      return state.banner;
     },
 
     obtUser(state) {

@@ -124,7 +124,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations(['ACTIVATE_SNACKBAR']),
+    ...mapMutations(['ACTIVATE_SNACKBAR', 'ACTIVATE_BANNER']),
 
     login() {
       this.botones(true);
@@ -165,40 +165,46 @@ export default {
       const estado = JSON.parse(window.localStorage.getItem('user_status'));
       let texto = '';
       let color = 'info';
+      let icon = '';
 
       if (estado !== null) {
         switch (estado) {
           case 'invalid':
             texto = 'El código ingresado es invalido.';
             color = 'warning';
+            icon = 'mdi-key-alert';
             break;
           case 'active':
             texto = 'Su usuario ya ha sido activado previamente.';
             color = 'info';
+            icon = 'mdi-information-variant';
             break;
           case 'activated':
             texto = '¡Su usuario ha sido activado! Ya puede iniciar sesión.';
             color = 'green';
+            icon = 'mdi-check-bold';
             break;
           case 'user_not_found':
             texto = 'No hemos encontrado su usuario. Favor de notificar al correo de soporte.';
             color = 'error';
+            icon = 'mdi-account-remove';
             break;
 
           default:
             texto = 'Ha ocurrido un error en el proceso de activación. Notifique al correo de soporte.';
             color = 'error';
+            icon = 'mdi-close-thick';
             break;
         }
 
-        this.ACTIVATE_SNACKBAR({
+        this.ACTIVATE_BANNER({
+          visible: true,
           text: texto,
+          icon,
           color,
         });
         localStorage.removeItem('user_status');
       }
-
-      console.log(estado);
     },
   },
 };
