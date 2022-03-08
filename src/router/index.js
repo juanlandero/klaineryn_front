@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 import Main from '@/views/layout/Main.vue';
+import LandingPage from '@/views/LandingPage.vue';
 import IniciarSesion from '@/views/auth/Index.vue';
 import Login from '@/views/auth/Login.vue';
 import Registro from '@/views/auth/Registro.vue';
@@ -25,6 +26,14 @@ import Test from '@/views/test/Test.vue';
 Vue.use(VueRouter);
 
 const routes = [
+  {
+    path: '/',
+    component: LandingPage,
+    meta: {
+      layout: 'full',
+      requiresAuth: false,
+    },
+  },
   // login
   {
     path: '/iniciar-sesion',
